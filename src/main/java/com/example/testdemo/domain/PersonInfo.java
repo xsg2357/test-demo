@@ -31,19 +31,19 @@ public class PersonInfo implements Serializable {
     private String address;
 
     @Column(name = "gender")
-    private Integer gender;
+    private int gender;
 
     @Column(name = "age")
-    private Integer age;
+    private int age;
 
     @Column(name = "educational")
     private String educational;
 
     @Column(name = "deptId")
-    private Integer deptid;
+    private int deptid;
 
     @Column(name = "isdelete")
-    private Integer isdelete;
+    private int isdelete;
 
     private static final long serialVersionUID = 1L;
 }
