@@ -25,7 +25,7 @@ public class PersonInfoController {
     @Autowired
     UserRepository userRepository;
 
-    @ApiOperation(value="用户操作", notes="获取个人信息")
+    @ApiOperation(value="个人信息", notes="获取个人信息")
     @GetMapping("/userInfo")
     public ResultBodyData<PersonInfo> personInfo(){
         String userId = CookieUtils.getCookieValue("userId");
@@ -40,7 +40,7 @@ public class PersonInfoController {
         return  new ResultBodyData<>(0,"ok",personInfo);
     }
 
-    @ApiOperation(value="用户操作", notes="修改个人密码")
+    @ApiOperation(value="修改密码", notes="修改个人密码")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "oldPwd",paramType = "query",value = "旧密码", required = true ,dataType = "string"),
             @ApiImplicitParam(name = "newPwd", paramType = "query",value = "新密码", required = true ,dataType = "string"),
