@@ -7,6 +7,7 @@ import com.example.testdemo.exception.ErrorInfo;
 import com.example.testdemo.repo.UserRepository;
 import com.example.testdemo.util.CookieUtils;
 import io.netty.util.internal.StringUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(description = "个人信息")
 @RequestMapping("/user")
 @RestController
 public class PersonInfoController {
@@ -40,8 +42,8 @@ public class PersonInfoController {
 
     @ApiOperation(value="用户操作", notes="修改个人密码")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "oldPwd", value = "旧密码", required = true ,dataType = "string"),
-            @ApiImplicitParam(name = "newPwd", value = "新密码", required = true ,dataType = "string"),
+            @ApiImplicitParam(name = "oldPwd",paramType = "query",value = "旧密码", required = true ,dataType = "string"),
+            @ApiImplicitParam(name = "newPwd", paramType = "query",value = "新密码", required = true ,dataType = "string"),
     })
     @GetMapping("/alterLoginPwd")
     public ResultBodyData<String> alterLoginPwd(@Param("oldPwd") String oldPwd, @Param("newPwd") String newPwd){
