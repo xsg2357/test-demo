@@ -7,7 +7,7 @@ import com.example.testdemo.domain.PageEntity;
 public interface AddressService {
 
     // 排序分页
-    PageEntity<AddressInfo> getPageSort(Integer pageNum, Integer pageLimit);
+    PageEntity<AddressInfo> getPageSort(int  userId,Integer pageNum, Integer pageLimit);
 
     long sumCount();
 }

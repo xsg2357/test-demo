@@ -142,8 +142,15 @@ public class LoginController {
     public ResultBodyData<String> logout(HttpServletRequest request) {
         HttpSession session = request.getSession();//获取当前session
         if (session != null) {
-            TokenInfo tokenInfo = (TokenInfo) session.getAttribute("sessionLogin");//从当前session中获取用户信息
+            //根据token获取响应的内容
             String token = request.getHeader("token");
+            List<TokenInfo> tokenInfoByToken = tokenRepository.findTokenInfoByToken(token);
+
+            if (tokenInfoByToken == null || tokenInfoByToken.size()==0){
+                throw  new CustomException(ErrorInfo.TOKEN_SESSION_ERROR);
+            }
+
+            TokenInfo tokenInfo = tokenInfoByToken.get(0);
             if (tokenInfo==null || StringUtil.isNullOrEmpty(tokenInfo.getToken()) || StringUtil.isNullOrEmpty(token)) {
                 throw new CustomException(ErrorInfo.TOKEN_SESSION_ERROR);
             }

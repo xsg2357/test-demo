@@ -21,13 +21,13 @@ public class AddressServiceImpl implements AddressService {
     AddressReposity addressReposity;
 
     @Override
-    public PageEntity<AddressInfo> getPageSort(Integer pageNum, Integer pageLimit) {
+    public PageEntity<AddressInfo> getPageSort(int  userId,Integer pageNum, Integer pageLimit) {
         List<Sort.Order> list = new ArrayList<>();
         Sort.Order order1 = new Sort.Order(Sort.Direction.DESC, "createTime");
         list.add(order1);
         Sort sort = Sort.by(list);
         Pageable pageable = PageRequest.of(pageNum - 1, pageLimit, sort);
-        Page<AddressInfo> all = addressReposity.findAll(pageable);
+        Page<AddressInfo> all = addressReposity.findAllByUserId(userId,pageable);
         List<AddressInfo> content = all.getContent();
 
         PageEntity<AddressInfo> pageEntity = new PageEntity<>();
