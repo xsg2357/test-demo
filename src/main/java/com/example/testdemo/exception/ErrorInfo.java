@@ -23,7 +23,9 @@ public enum ErrorInfo {
     USER_ERROR(2007, "用户错误信息，请联系后台"),
     TOKEN_SESSION_ERROR(2008, "token失效或Session錯誤"),
     LOGIN_ERROR(2009, "还没有登录"),
-    ADDRESS_NOT_EXIST(1002, "地址不能为空");
+    AREA_NOT_EXIST(2010, "地质区域不能为空"),
+    AREA_INFO_NOT_EXIST(2010, "地址信息不存在"),
+    ADDRESS_NOT_EXIST(1002, "地址信息不能为空");
 
     public Integer code;
     public String message;

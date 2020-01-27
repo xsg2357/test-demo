@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AddressReposity extends JpaRepository<AddressInfo,Long> {
 
-    Page<AddressInfo> findAllByUserId(int   userId, Pageable pageable);
+    Page<AddressInfo> findAllByUserIdAndIsDelete(int   userId,int isDelete, Pageable pageable);
+
+    AddressInfo findAddressInfoById(int id);
 
 }

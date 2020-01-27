@@ -1,6 +1,7 @@
 package com.example.testdemo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.util.Date;
 @Entity(name = "address_info")
 public class AddressInfo implements Serializable {
 
+    @ApiModelProperty(hidden=true)
     @Id
     @Column(name = "id")
     @GeneratedValue(generator = "JDBC")
@@ -31,6 +33,7 @@ public class AddressInfo implements Serializable {
     @Column(name = "type")
     private int type;
 
+    @ApiModelProperty(hidden=true)
     @JsonIgnore
     @Column(name = "isDelete")
     private int isDelete;
@@ -41,9 +44,11 @@ public class AddressInfo implements Serializable {
     @Column(name = "lng")
     private double lng;
 
+    @ApiModelProperty(hidden=true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
+    @ApiModelProperty(hidden=true)
     @Column(name = "userId")
     private int userId;
 
