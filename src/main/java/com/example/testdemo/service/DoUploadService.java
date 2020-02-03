@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Random;
 
 @Service
@@ -28,7 +29,7 @@ public class DoUploadService {
             //将后缀放在新文件名的后面
             newFileName = newFileName + substring;
             //生成路径
-            String filePath = new DateTime().toString("yyyy/MM/dd");
+            String filePath = new DateTime().toString("yyyy/MM/dd", Locale.CHINA);
             //上传
             Boolean resultBoolean = UploadFileStatus.uploadFile(0,ftpProperties.getHost(), Integer.parseInt(ftpProperties.getPort()), ftpProperties.getUsername(), ftpProperties.getPassword(), ftpProperties.getBasePath(), filePath, newFileName, multipartFile.getInputStream());
             //判断是否上传成功
@@ -65,7 +66,7 @@ public class DoUploadService {
             //将后缀放在新文件名的后面
             newFileName = newFileName + substring;
             //生成路径
-            String filePath = new DateTime().toString("yyyy/MM/dd");
+            String filePath = new DateTime().toString("yyyy/MM/dd", Locale.CHINA);
             //上传
             try {
                 Boolean resultBoolean = UploadFileStatus.uploadFile(1,ftpProperties.getHost(), Integer.parseInt(ftpProperties.getPort()),
