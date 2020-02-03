@@ -16,7 +16,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(tokenInterceptor).addPathPatterns("/user/**","/logout","address/*")
+        registry.addInterceptor(tokenInterceptor).addPathPatterns("/user/**","/logout","address/*","/file/*")
                 .excludePathPatterns("/register","/login");
         super.addInterceptors(registry);
     }
@@ -30,5 +30,10 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
+
+        // 当访问/file下的资源时，会到/root/myFile/下去找
+        // 例如访问：http://localhost:8080/file/1.png时会去找/root/myFile/1.png
+//        registry.addResourceHandler("/file/**").addResourceLocations("file:/root/myFile/");
+//        super.addResourceHandlers(registry);
     }
 }

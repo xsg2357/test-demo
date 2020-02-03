@@ -25,6 +25,9 @@ public enum ErrorInfo {
     LOGIN_ERROR(2009, "还没有登录"),
     AREA_NOT_EXIST(2010, "地质区域不能为空"),
     AREA_INFO_NOT_EXIST(2010, "地址信息不存在"),
+    FILE_UPLOAD_FAILED(3010, "文件上传失败！！！"),
+    FILE_NMAE_EMPTY(3011, "文件名为空！！！"),
+    FILE_SIZE_OVER(3012, "上传文件过大,最大为50MB！！！"),
     ADDRESS_NOT_EXIST(1002, "地址信息不能为空");
 
     public Integer code;

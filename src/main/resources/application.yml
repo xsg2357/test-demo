@@ -1,6 +1,20 @@
 server:
   port: 8080   # HTTP (Tomcat) port
 spring:
+  #ftp服务器的地址
+  ftp:
+    host: 119.29.107.83
+    port: 21
+    username: ftpuser
+    password: xsg435268
+    basepath: /home/ftpuser/www/images
+    httpPath: http://119.29.107.83:8088/images
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0B
+      location: #
+      resolve-lazily: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://119.29.107.83:3307/tokentest?useUnicode=true&characterEncoding=utf-8&useTimezone=true&serverTimezone=GMT%2B8
