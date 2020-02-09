@@ -28,6 +28,9 @@ public enum ErrorInfo {
     FILE_UPLOAD_FAILED(3010, "文件上传失败！！！"),
     FILE_NMAE_EMPTY(3011, "文件名为空！！！"),
     FILE_SIZE_OVER(3012, "上传文件过大,最大为50MB！！！"),
+    PARAMS_ERROR(3016, "BODY参数为空或者错误"),
+    PARAMS_VALUES_ERROR(3018, "参数值为空"),
+    Category_ERROR(3017, "分类错误"),
     ADDRESS_NOT_EXIST(1002, "地址信息不能为空");
 
     public Integer code;
