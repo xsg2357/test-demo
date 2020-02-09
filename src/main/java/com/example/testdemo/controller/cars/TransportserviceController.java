@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/transportservice")
 @RestController
@@ -30,6 +32,8 @@ public class TransportserviceController {
     CarRouteInfoReposity carRouteInfoReposity;
     @Autowired
     AdviceReposity adviceReposity;
+    @Autowired
+    WeatherReposity weatherReposity;
 
 
     @PostMapping(value = "/action/GetNewsInfo.do", produces = "application/json;charset=UTF-8")
@@ -75,6 +79,7 @@ public class TransportserviceController {
         }
         return new ResultBodyData<>(0, "oK", all);
     }
+
     @PostMapping(value = "/action/GetAllSuggestion.do", produces = "application/json;charset=UTF-8")
     public ResultBodyData<List<AdviceInfo>> allSuggestion(@RequestBody JSONObject jsonParam) {
         if (!jsonParam.containsKey("UserName")) {
@@ -82,6 +87,25 @@ public class TransportserviceController {
         }
         return new ResultBodyData<>(0, "oK", adviceReposity.findAll());
     }
+
+    @PostMapping(value = "/action/GetBusCapacity.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<Map<String,Object>> getBusCapacity(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName") || !jsonParam.containsKey("BusId")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+        int busId = jsonParam.getIntValue("BusId");
+        if (busId == 0){
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+        Map<String,Object> data = new HashMap<>();
+        if (busId ==1){
+            data.put("BusCapacity",10);
+        }else{
+            data.put("BusCapacity",20);
+        }
+        return new ResultBodyData<>(0, "oK", data);
+    }
+
     @PostMapping(value = "/action/SetSuggestion.do", produces = "application/json;charset=UTF-8")
     public ResultBodyData<String> setSuggestion(@RequestBody JSONObject jsonParam) {
         if (!jsonParam.containsKey("UserName") ||!jsonParam.containsKey("Title") ||!jsonParam.containsKey("Content")
@@ -104,6 +128,14 @@ public class TransportserviceController {
 
 
         return new ResultBodyData<>(0, "oK", "");
+    }
+
+    @PostMapping(value = "/action/GetWeather.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<List<Weather>> getWeather(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+        return new ResultBodyData<>(0, "oK", weatherReposity.findAll());
     }
 
 }
