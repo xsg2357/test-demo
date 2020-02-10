@@ -29,7 +29,10 @@ public enum ErrorInfo {
     FILE_NMAE_EMPTY(3011, "文件名为空！！！"),
     FILE_SIZE_OVER(3012, "上传文件过大,最大为50MB！！！"),
     PARAMS_ERROR(3016, "BODY参数为空或者错误"),
-    PARAMS_VALUES_ERROR(3018, "参数值为空"),
+    PARAMS_VALUES_ERROR(3018, "参数值为或者错误"),
+    PATH_PARAMS_VALUES_ERROR(3019, "参数值错误：PathId范围为1-4"),
+    RESULT_EMPTY(3019, "查询结果为空"),
+    RESULT_TRAFFIC_EMPTY(3020, "查询结果为空"),
     Category_ERROR(3017, "分类错误"),
     ADDRESS_NOT_EXIST(1002, "地址信息不能为空");
 
