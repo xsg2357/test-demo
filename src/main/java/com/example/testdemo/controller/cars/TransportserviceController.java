@@ -61,6 +61,20 @@ public class TransportserviceController {
     CarETCLogReposity carETCLogReposity;
     @Autowired
     CarRoadReposity carRoadReposity;
+    @Autowired
+    CarParkReposity carParkReposity;
+    @Autowired
+    CarParkLogReposity carParkLogReposity;
+    @Autowired
+    CarParkNearReposity carParkNearReposity;
+    @Autowired
+    CarBusReposity carBusReposity;
+    @Autowired
+    CarBusStationReposity carBusStationReposity;
+    @Autowired
+    CarInfoReposity carInfoReposity;
+    @Autowired
+    CarCodeReposity carCodeReposity;
 
 
     @PostMapping(value = "/action/GetNewsInfo.do", produces = "application/json;charset=UTF-8")
@@ -148,7 +162,7 @@ public class TransportserviceController {
             throw new CustomException(ErrorInfo.PARAMS_ERROR);
         }
         int busId = jsonParam.getIntValue("BusId");
-        if (busId == 0) {
+        if (busId <= 0 || busId >2) {
             throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
         }
         Map<String, Object> data = new HashMap<>();
@@ -728,7 +742,7 @@ public class TransportserviceController {
     }
 
     @PostMapping(value = "/action/GetRoadStatus.do", produces = "application/json;charset=UTF-8")
-    public ResultBodyData<Map<String,Object>> GetRoadStatus(@RequestBody JSONObject jsonParam) {
+    public ResultBodyData<Map<String, Object>> GetRoadStatus(@RequestBody JSONObject jsonParam) {
         if (!jsonParam.containsKey("UserName") || !jsonParam.containsKey("RoadId")) {
             throw new CustomException(ErrorInfo.PARAMS_ERROR);
         }
@@ -744,7 +758,7 @@ public class TransportserviceController {
             throw new CustomException(ErrorInfo.USER_NOT_EXIST);
         }
 
-        CarRoad car = carRoadReposity.findCarRoadByUserIdAndId(carUser.getId(),RoadId);
+        CarRoad car = carRoadReposity.findCarRoadByUserIdAndId(carUser.getId(), RoadId);
         Map<String, Object> data = new HashMap<>();
         data.put("Status", car.getStatus());
 
@@ -808,7 +822,6 @@ public class TransportserviceController {
             carSensor.setUserId(carUser.getId());
             carSensor.setMoney(Money);
         } else {
-            carSensor = new CarETC();
             if (RateType.equals("Hour") || RateType.equals("Count")) {
                 carSensor.setMoney(Money);
             } else {
@@ -819,5 +832,288 @@ public class TransportserviceController {
 
         return new ResultBodyData<>(0, "oK", "");
     }
+
+    @PostMapping(value = "/action/SetParkRate.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<String> SetParkRate(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName") || !jsonParam.containsKey("RateType") || !jsonParam.containsKey("Money")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        String RateType = jsonParam.getString("RateType");
+        int Money = jsonParam.getIntValue("Money");
+        if (StringUtil.isNullOrEmpty(UserName) || StringUtil.isNullOrEmpty(RateType)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        CarPark carSensor = carParkReposity.findCarParkByUserId(carUser.getId());
+        if (carSensor == null) {
+            carSensor = new CarPark();
+            if (RateType.equals("Hour") || RateType.equals("Count")) {
+                carSensor.setRateType(RateType);
+            } else {
+                throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+            }
+            carSensor.setUserId(carUser.getId());
+            carSensor.setMoney(Money);
+        } else {
+            if (RateType.equals("Hour") || RateType.equals("Count")) {
+                carSensor.setMoney(Money);
+            } else {
+                throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+            }
+        }
+        carParkReposity.save(carSensor);
+
+        return new ResultBodyData<>(0, "oK", "");
+    }
+
+    @PostMapping(value = "/action/GetParkRate.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<Map<String, Object>> GetParkRate(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName") || !jsonParam.containsKey("RateType")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        String RateType = jsonParam.getString("RateType");
+        if (StringUtil.isNullOrEmpty(UserName) || StringUtil.isNullOrEmpty(RateType)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        CarPark carSensor = carParkReposity.findCarParkByUserId(carUser.getId());
+        if (carSensor == null) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+        if (!carSensor.getRateType().equals(RateType)) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("Money", carSensor.getMoney());
+        data.put("RateType", carSensor.getRateType());
+
+        return new ResultBodyData<>(0, "oK", data);
+    }
+
+    @PostMapping(value = "/action/GetParkFree.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<Map<String, Object>> GetParkFree(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        if (StringUtil.isNullOrEmpty(UserName)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        List<CarPark> carSensor = carParkReposity.findCarParksBySatusAndUserId(0, carUser.getId());
+        if (carSensor == null || carSensor.size() == 0) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("ParkFreeId", carSensor.get(0).getId());
+        return new ResultBodyData<>(0, "oK", data);
+    }
+
+    @PostMapping(value = "/action/SetUserBusLine.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<String> SetUserBusLine(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName") ||
+                !jsonParam.containsKey("Id") ||
+                !jsonParam.containsKey("PhoneNumber") ||
+                !jsonParam.containsKey("StartSite") ||
+                !jsonParam.containsKey("EndSite") ||
+                !jsonParam.containsKey("BusDate")
+        ) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+        String UserName = jsonParam.getString("UserName");
+        if (StringUtil.isNullOrEmpty(UserName)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+        CarBus carBus = carBusReposity.findCarBusByUserId(carUser.getId());
+        if (carBus == null) {
+            carBus = new CarBus();
+            carBus.setUserId(carUser.getId());
+        }
+        carBus.setBusDate(jsonParam.getString("BusDate"));
+        carBus.setStartSite(jsonParam.getString("StartSite"));
+        carBus.setEndSite(jsonParam.getString("EndSite"));
+        carBus.setPhoneNumber(jsonParam.getString("PhoneNumber"));
+
+        carBusReposity.save(carBus);
+
+        return new ResultBodyData<>(0, "oK", "");
+    }
+
+    @PostMapping(value = "/action/GetUserBusLine.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<List<CarBus>> GetUserBusLine(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        if (StringUtil.isNullOrEmpty(UserName)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        List<CarBus> carSensor = carBusReposity.findCarBusesByUserId(carUser.getId());
+        if (carSensor == null || carSensor.size() == 0) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+        return new ResultBodyData<>(0, "oK", carSensor);
+    }
+
+
+    @PostMapping(value = "/action/GetPakingListReport.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<List<CarParLog>> GetPakingListReport(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        if (StringUtil.isNullOrEmpty(UserName)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        List<CarParLog> carSensor = carParkLogReposity.findCarParLogsByUserId(carUser.getId());
+        if (carSensor == null || carSensor.size() == 0) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+        return new ResultBodyData<>(0, "oK", carSensor);
+    }
+
+
+    @PostMapping(value = "/action/GetCarParkInfo.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<CarParkNear> GetCarParkInfo(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        if (StringUtil.isNullOrEmpty(UserName)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        CarParkNear carSensor = carParkNearReposity.findCarParkNearByUserId(carUser.getId());
+        if (carSensor == null) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+        return new ResultBodyData<>(0, "oK", carSensor);
+    }
+
+    @PostMapping(value = "/action/GetBusStationInfo.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<List<CarBusStation>> GetBusStationInfo(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName") || !jsonParam.containsKey("BusStationId")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        if (StringUtil.isNullOrEmpty(UserName)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        List<CarBusStation> carSensor = carBusStationReposity.findCarBusStationsByUserId(carUser.getId());
+        if (carSensor == null) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+        return new ResultBodyData<>(0, "oK", carSensor);
+    }
+
+    @PostMapping(value = "/action/GetCarInfo.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<List<CarInfo>> GetCarInfo(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        if (StringUtil.isNullOrEmpty(UserName)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        List<CarInfo> carSensor = carInfoReposity.findCarInfosByUserId(carUser.getId());
+        if (carSensor == null) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+        return new ResultBodyData<>(0, "oK", carSensor);
+    }
+
+    @PostMapping(value = "/action/GetPeccancyType.do", produces = "application/json;charset=UTF-8")
+    public ResultBodyData<List<CarCode>> GetPeccancyType(@RequestBody JSONObject jsonParam) {
+        if (!jsonParam.containsKey("UserName")) {
+            throw new CustomException(ErrorInfo.PARAMS_ERROR);
+        }
+
+        String UserName = jsonParam.getString("UserName");
+        if (StringUtil.isNullOrEmpty(UserName)) {
+            throw new CustomException(ErrorInfo.PARAMS_VALUES_ERROR);
+        }
+
+        CarUser carUser = carUserReposity.findCarUserByUserName(UserName);
+        if (carUser == null) {
+            throw new CustomException(ErrorInfo.USER_NOT_EXIST);
+        }
+
+        List<CarCode> carSensor = carCodeReposity.findCarCodesByUserId(carUser.getId());
+        if (carSensor == null) {
+            throw new CustomException(ErrorInfo.RESULT_EMPTY);
+        }
+
+        return new ResultBodyData<>(0, "oK", carSensor);
+    }
+
+
 
 }
